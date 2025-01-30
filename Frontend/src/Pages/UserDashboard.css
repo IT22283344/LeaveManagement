@@ -1,0 +1,36 @@
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.form-tile {
+  cursor: pointer;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.form-tile:hover {
+  transform: scale(1.05);
+}
+
+.form-status {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.form-update-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.form-cancel-btn {
+  margin-top: 10px;
+  width: 100%;
+}
