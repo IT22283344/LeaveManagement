@@ -1,6 +1,3 @@
-
-
-
 import { Button, Modal, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
@@ -28,7 +25,13 @@ export default function DashLeave() {
           const filteredLeaves = data.leave.filter(
             (leave) => !(currentUser.isManager && leave.isManager === true)
           );
-          setStaffLeave(filteredLeaves);
+          // Sort filtered leaves, prioritizing "Pending"
+          const sortedLeaves = filteredLeaves.sort((a, b) => {
+            if (a.status === "Pending" && b.status !== "Pending") return -1;
+            if (a.status !== "Pending" && b.status === "Pending") return 1;
+            return 0; // Maintain order for non-pending requests
+          });
+          setStaffLeave(sortedLeaves);
         }
       } catch (error) {
         console.log(error.message);
@@ -164,7 +167,6 @@ export default function DashLeave() {
     }
   };
 
-
   return (
     <div className="table-auto overflow-x-scroll p-3">
       <div className="flex justify-between mb-7">
@@ -175,7 +177,11 @@ export default function DashLeave() {
           onChange={handleSearch}
           className="px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
         />
-        <Button onClick={generatePDFReport} gradientDuoTone="purpleToBlue" outline>
+        <Button
+          onClick={generatePDFReport}
+          gradientDuoTone="purpleToBlue"
+          outline
+        >
           Generate Report
         </Button>
       </div>
@@ -198,23 +204,29 @@ export default function DashLeave() {
           {staffLeave.map((leave) => (
             <Table.Body key={leave._id}>
               <Table.Row>
-                <Table.Cell>{new Date(leave.appliedOn).toLocaleDateString()}</Table.Cell>
+                <Table.Cell>
+                  {new Date(leave.appliedOn).toLocaleDateString()}
+                </Table.Cell>
                 <Table.Cell>{leave.employeeId}</Table.Cell>
                 <Table.Cell>{leave.staffmembername}</Table.Cell>
                 <Table.Cell>{leave.departmentname}</Table.Cell>
                 <Table.Cell>{leave.email}</Table.Cell>
                 <Table.Cell>{leave.leaveType}</Table.Cell>
-                <Table.Cell>{new Date(leave.startDate).toLocaleDateString()}</Table.Cell>
-                <Table.Cell>{new Date(leave.endDate).toLocaleDateString()}</Table.Cell>
+                <Table.Cell>
+                  {new Date(leave.startDate).toLocaleDateString()}
+                </Table.Cell>
+                <Table.Cell>
+                  {new Date(leave.endDate).toLocaleDateString()}
+                </Table.Cell>
                 <Table.Cell>
                   <span
                     className={`p-2 rounded-lg font-semibold ${
                       leave.status === "Pending"
-                        ? "bg-yellow-500"
+                        ? "text-yellow-500"
                         : leave.status === "Approved"
-                        ? "bg-green-500"
-                        : "bg-red-500"
-                    } text-white`}
+                        ? "text-blue-600"
+                        : "text-red-600"
+                    } text-sm`}
                   >
                     {leave.status}
                   </span>
@@ -259,7 +271,9 @@ export default function DashLeave() {
         <Modal.Body>
           <div className="text-center">
             <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 mb-4 mx-auto" />
-            <h3 className="mb-5 text-lg text-gray-500">Are you sure you want to delete this leave request?</h3>
+            <h3 className="mb-5 text-lg text-gray-500">
+              Are you sure you want to delete this leave request?
+            </h3>
           </div>
           <div className="flex justify-center gap-4">
             <Button color="failure" onClick={handleDeleteLeave}>
