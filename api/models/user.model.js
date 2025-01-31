@@ -42,40 +42,7 @@ const userSchema = new mongoose.Schema({
         unique:true
 
     },
-    itnumber:{
-
-        type:String,
-        unique:true
-
-    },
-    distance:{
-
-        type:String,
-       
-       
-
-    },
-    acYear:{
-
-        type:String,
-        
-       
-
-    },
-    mode:{
-
-        type:String,
-       
-       
-
-    },
-    degree:{
-
-        type:String,
-        
-       
-
-    },
+    
     isAdmin:{
         type:Boolean,
         default:false

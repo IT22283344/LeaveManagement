@@ -6,15 +6,15 @@ import jwt from "jsonwebtoken";
 
 
 export const signup = async (req, res, next) => {
-  const { username, email, password, mobile, adress,itnumber,distance,acYear,mode,degree } = req.body;
+  const { username, email, password, mobile, adress,employeeId } = req.body;
 
   
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const mobileRegex = /^(071|076|077|075|078|070|074|072)\d{7}$/;
   const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{5,}$/;
 
-  if (!username || !email || !password || !mobile || !adress || !itnumber || !distance || !acYear || !mode || !degree ||
-      username === "" || email === "" || password === "" || mobile === "" || adress === "" ||itnumber==="" || distance==="" ||acYear===""||mode===""||degree==="" ) {
+  if (!username || !email || !password || !mobile || !adress || !employeeId||
+      username === "" || email === "" || password === "" || mobile === "" ||employeeId === "") {
       return next(errorHandler(400, 'All fields are required'));
   } else if (!emailRegex.test(email)) {
       return next(errorHandler(400, 'Invalid email format'));
@@ -27,7 +27,7 @@ export const signup = async (req, res, next) => {
 }
 
   const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({ username, email, password: hashedPassword, adress, mobile,itnumber,distance,acYear,mode,degree });
+  const newUser = new User({ username, email, password: hashedPassword, adress, mobile,employeeId });
 
   try {
       await newUser.save();

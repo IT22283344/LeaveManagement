@@ -198,7 +198,7 @@ export default function DashUsers() {
                 <Table.Cell>{member.contactNumber}</Table.Cell>
                 <Table.Cell>
                   {member.isManager ? (
-                    <span className="font-bold text-green-600">Manager</span>
+                    <span className="font-semibold text-lg text-black">Manager</span>
                   ) : (
                     member.position
                   )}{" "}

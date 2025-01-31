@@ -60,10 +60,6 @@ export const updateUser = async (req,res,next) => {
                 adress:req.body.adress,
                 mobile:req.body.mobile,
                 employeeId:req.body.employeeId,
-                distance:req.body.distance,
-                acYear:req.body.acYear,
-                mode:req.body.mode,
-                degree:req.body.degree
 
             }
         },

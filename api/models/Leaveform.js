@@ -45,6 +45,7 @@ const leaveSchema = new mongoose.Schema({
   appliedOn: { type: Date, default: Date.now },
   approvalDate: { type: Date },
   comments: { type: String },
+  isManager:{type:Boolean,ref: "staff"},
 });
 
 const Leaveform = mongoose.model("Leaveform", leaveSchema);

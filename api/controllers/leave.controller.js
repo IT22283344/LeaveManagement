@@ -13,6 +13,7 @@ export const addleaveform = async (req, res, next) => {
     status,
     address,
     contactno,
+    isManager,
   } = req.body;
 
   try {
@@ -30,6 +31,7 @@ export const addleaveform = async (req, res, next) => {
       email: staff.email, // Use staff's email from the database
       leaveType,
       departmentname: staff.departmentname,
+      isManager:staff.isManager,
       startDate,
       endDate,
       reason,
@@ -80,6 +82,7 @@ export const updateLeaveform = async (req, res, next) => {
     status,
     address,
     contactno,
+    isManager,
   } = req.body;
 
   try {
@@ -99,6 +102,7 @@ export const updateLeaveform = async (req, res, next) => {
           staffmembername: staff.Staffmembername,
           email: staff.email,
           departmentname: staff.departmentname,
+          isManager:staff.isManager,
           leaveType,
           startDate,
           endDate,

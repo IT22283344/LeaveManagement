@@ -17,7 +17,7 @@ export default function DashLeave() {
   const [totalLeaves, setTotalLeaves] = useState(0);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const navigate =useNavigate();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     const fetchLeaveRequests = async () => {
@@ -148,7 +148,7 @@ export default function DashLeave() {
   };
 
   const handleUpdateLeaveStatus = async (_id, newStatus) => {
-    console.log(_id)
+    console.log(_id);
     try {
       const response = await fetch(`/api/leave/updateleaveform/${_id}`, {
         method: "PUT",
@@ -157,14 +157,14 @@ export default function DashLeave() {
         },
         body: JSON.stringify({ status: newStatus }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.text(); // In case the response is not JSON
         throw new Error(
           `Failed to update leave status. Status: ${response.status}, Message: ${errorData}`
         );
       }
-  
+
       const data = await response.json();
       if (data) {
         alert(`Leave status updated to ${newStatus}`);
@@ -183,7 +183,6 @@ export default function DashLeave() {
       alert(`Error updating leave status: ${error.message}`);
     }
   };
-  
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
@@ -200,7 +199,6 @@ export default function DashLeave() {
             </Button>
           </Link>
         </div>
-        
       </div>
 
       <div className="flex justify-between mb-7">
@@ -216,12 +214,12 @@ export default function DashLeave() {
           gradientDuoTone="purpleToBlue"
           outline
           onClick={handleGenerateReport}
+          onChange={handleSearch}
           className=""
         >
           Generate Report
         </Button>
       </div>
-
 
       {currentUser.isAdmin && staffLeave.length > 0 ? (
         <>
@@ -271,7 +269,7 @@ export default function DashLeave() {
                               : "bg-red-600 text-white" // Rejected styling
                           }`}
                         >
-                          {leaveRequest.status }
+                          {leaveRequest.status}
                         </span> //Need to implement status changing process
                       ))}
                   </Table.Cell>
@@ -434,22 +432,26 @@ export default function DashLeave() {
                 </span>
               </div>
               <div className="flex flex-row gap-3">
-                <button
-                  className="p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
-                  onClick={() =>
-                    handleUpdateLeaveStatus(selectedLeave._id, "Approved")
-                  }
-                >
-                  Approve
-                </button>
-                <button
-                  className="p-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-800"
-                  onClick={() =>
-                    handleUpdateLeaveStatus(selectedLeave._id, "Rejected")
-                  }
-                >
-                  Reject
-                </button>
+                {currentUser.isManager && (
+                  <>
+                    <button
+                      className="p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+                      onClick={() =>
+                        handleUpdateLeaveStatus(selectedLeave._id, "Approved")
+                      }
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="p-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-800"
+                      onClick={() =>
+                        handleUpdateLeaveStatus(selectedLeave._id, "Rejected")
+                      }
+                    >
+                      Reject
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ) : (

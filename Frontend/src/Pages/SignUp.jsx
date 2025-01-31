@@ -21,7 +21,8 @@ export default function SignUp() {
       !formData.email ||
       !formData.password ||
       !formData.mobile ||
-      !formData.adress
+      !formData.adress ||
+      !formData.employeeId
     ) {
       return setError("Please Fill all Fields");
     }
@@ -110,51 +111,15 @@ export default function SignUp() {
             />
           </div>
           <div>
-            <Label value="Your IT Number" />
+            <Label value="Your EmployeeId" />
             <TextInput
               type="text"
-              placeholder="IT Number"
-              id="itnumber"
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <Label value="Distance To Company" />
-            <TextInput
-              type="text"
-              placeholder="Distance To Company"
-              id="distance"
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <Label value="Your Accademic Year" />
-            <TextInput
-              type="text"
-              placeholder="Accademic Year"
-              id="acYear"
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <Label value="Mode Of Transport" />
-            <TextInput
-              type="text"
-              placeholder="Mode Of Transport"
-              id="mode"
+              placeholder="EmployeeID"
+              id="employeeId"
               onChange={handleChange}
             />
           </div>
           
-          <div>
-            <Label value="Degree Programme" />
-            <TextInput
-              type="text"
-              placeholder="Degree Programme"
-              id="degree"
-              onChange={handleChange}
-            />
-          </div>
           <div>
             <Label value="Your password" />
             <div className="relative">
