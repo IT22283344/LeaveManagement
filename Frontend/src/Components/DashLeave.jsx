@@ -221,7 +221,7 @@ export default function DashLeave() {
         </Button>
       </div>
 
-      {currentUser.isAdmin && staffLeave.length > 0 ? (
+      {(currentUser.isAdmin || currentUser.isManager) && staffLeave.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
             <Table.Head>
@@ -432,26 +432,22 @@ export default function DashLeave() {
                 </span>
               </div>
               <div className="flex flex-row gap-3">
-                {currentUser.isManager && (
-                  <>
-                    <button
-                      className="p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
-                      onClick={() =>
-                        handleUpdateLeaveStatus(selectedLeave._id, "Approved")
-                      }
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="p-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-800"
-                      onClick={() =>
-                        handleUpdateLeaveStatus(selectedLeave._id, "Rejected")
-                      }
-                    >
-                      Reject
-                    </button>
-                  </>
-                )}
+                <button
+                  className="p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+                  onClick={() =>
+                    handleUpdateLeaveStatus(selectedLeave._id, "Approved")
+                  }
+                >
+                  Approve
+                </button>
+                <button
+                  className="p-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-800"
+                  onClick={() =>
+                    handleUpdateLeaveStatus(selectedLeave._id, "Rejected")
+                  }
+                >
+                  Reject
+                </button>
               </div>
             </div>
           ) : (

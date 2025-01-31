@@ -81,7 +81,7 @@ export default function DashSideBar() {
             </Sidebar.Item>
           </Link>
 
-          {currentUser?.isAdmin && (
+          {(currentUser?.isAdmin || currentUser?.isManager) && (
             <>
               <Link to="/dashboard?tab=users" key="users">
                 <Sidebar.Item

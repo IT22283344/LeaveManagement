@@ -13,6 +13,8 @@ export const add = async (req, res, next) => {
   const password = req.body.password;
   const contactNumber = req.body.contactNumber;
   const position = req.body.position;
+  const isManager = req.body.isManager;
+
 
   const newstaffmember = new staff({
     Staffmembername,
@@ -22,7 +24,8 @@ export const add = async (req, res, next) => {
     password,
     contactNumber,
     position,
-    profilePicture
+    profilePicture,
+    isManager,
   });
 
   try {
@@ -150,7 +153,7 @@ export const updatestaff = async (req, res, next) => {
           contactNumber: req.body.contactNumber,
           position: req.body.position,
           profilePicture:req.body.profilePicture,
-
+          isManager:req.body.isManager,
         },
       },
       { new: true }

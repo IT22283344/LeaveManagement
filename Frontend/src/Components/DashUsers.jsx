@@ -40,7 +40,7 @@ export default function DashUsers() {
       }
     };
 
-    if (currentUser.isAdmin) {
+    if (currentUser.isAdmin || currentUser.isManager) {
       fetchs();
     }
   }, []);
@@ -164,7 +164,7 @@ export default function DashUsers() {
       </div>
 
       {/* Staff Table */}
-      {currentUser.isAdmin && Staffmembers.length > 0 ? (
+      {(currentUser?.isAdmin || currentUser?.isManager) && Staffmembers.length > 0 ? (
         <Table hoverable className="shadow-md">
           <Table.Head>
             <Table.HeadCell>Employee ID</Table.HeadCell>
@@ -173,7 +173,7 @@ export default function DashUsers() {
             <Table.HeadCell>Department</Table.HeadCell>
             <Table.HeadCell>Contact Number</Table.HeadCell>
             <Table.HeadCell>Position</Table.HeadCell>
-            <Table.HeadCell>Manager Privilege</Table.HeadCell>
+            {currentUser?.isAdmin && <Table.HeadCell>Manager Priviledge</Table.HeadCell>}       
             <Table.HeadCell>Delete</Table.HeadCell>
             <Table.HeadCell>Send Mail</Table.HeadCell>
             <Table.HeadCell>Edit</Table.HeadCell>

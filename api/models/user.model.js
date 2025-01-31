@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    isManager:{
+        type:Boolean,
+        ref: "staff",
+    },
+
 
     isOwner:{
         type:Boolean,
