@@ -1,12 +1,11 @@
+
+
+
 import { Button, Modal, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
-import {
-  HiGift,
-  HiOutlineExclamationCircle,
-  HiOutlineHome,
-} from "react-icons/hi";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import html2pdf from "html2pdf.js";
 
 export default function DashLeave() {
@@ -14,11 +13,10 @@ export default function DashLeave() {
   const [staffLeave, setStaffLeave] = useState([]);
   const [showModel, setShowModel] = useState(false);
   const [leaveIdToDelete, setLeaveIdToDelete] = useState("");
-  const [totalLeaves, setTotalLeaves] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     const fetchLeaveRequests = async () => {
       try {
@@ -26,9 +24,11 @@ export default function DashLeave() {
           `/api/leave/getleaveform?searchTerm=${searchTerm}`
         );
         const data = await res.json();
-        console.log(data);
         if (res.ok) {
-          setStaffLeave(data.leave);
+          const filteredLeaves = data.leave.filter(
+            (leave) => !(currentUser.isManager && leave.isManager === true)
+          );
+          setStaffLeave(filteredLeaves);
         }
       } catch (error) {
         console.log(error.message);
@@ -36,44 +36,33 @@ export default function DashLeave() {
     };
 
     fetchLeaveRequests();
-  }, [searchTerm]); // Added dependency array to prevent infinite loop
+  }, [searchTerm, currentUser]);
 
   const handleDeleteLeave = async () => {
     try {
-      setShowModel(false); // Close the modal immediately
+      setShowModel(false);
 
-      console.log(`Attempting to delete leave ID: ${leaveIdToDelete}`);
       const res = await fetch(
         `/api/leave/deleteLeaverequest/${leaveIdToDelete}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
 
       if (!res.ok) {
         const errorData = await res.json();
-        console.error("Error deleting leave:", errorData.message);
-        alert(`Failed to delete leave: ${errorData.message}`); // Display an error message to the user
+        alert(`Failed to delete leave: ${errorData.message}`);
         return;
       }
 
-      // If successful, update the local state
       setStaffLeave((prev) =>
         prev.filter((leave) => leave._id !== leaveIdToDelete)
       );
-      console.log("Deleted leave successfully!");
-
-      // Reset `leaveIdToDelete` to prevent accidental reuse
       setLeaveIdToDelete("");
     } catch (error) {
-      console.error("Error during deletion:", error.message);
       alert(`An error occurred: ${error.message}`);
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const generatePDFReport = () => {
     const content = `
@@ -89,25 +78,20 @@ export default function DashLeave() {
         }
         th {
           background-color: #f2f2f2;
-          font-size: 14px; /* Adjust font size */
+          font-size: 14px;
         }
         td {
-          font-size: 12px; /* Adjust font size */
+          font-size: 12px;
         }
       </style>
       <h1><b>Daily Staff Leave Details Report</b></h1>
-      
-      
-      <br>
-      <br>
       <table>
         <thead>
           <tr>
             <th>Added Date</th>
             <th>EmployeeID</th>
             <th>Employee Name</th>
-            <th>Email
-            </th>
+            <th>Email</th>
             <th>Leave Type</th>
             <th>StartDate</th>
             <th>EndDate</th>
@@ -118,19 +102,19 @@ export default function DashLeave() {
         <tbody>
           ${staffLeave
             .map(
-              (leaves) => `
-            <tr>
-              <td>${new Date(leaves.appliedOn).toLocaleDateString()}</td>
-              <td>${leaves.employeeId}</td>
-              <td>${leaves.staffmembername}</td>
-              <td>${leaves.email}</td>
-              <td>${leaves.leaveType}</td>
-              <td>${new Date(leaves.startDate).toLocaleDateString()}</td>
-              <td>${new Date(leaves.endDate).toLocaleDateString()}</td>
-              <td>${leaves.reason}</td>
-              <td>${leaves.status}</td>
-            </tr>
-          `
+              (leave) => `
+                <tr>
+                  <td>${new Date(leave.appliedOn).toLocaleDateString()}</td>
+                  <td>${leave.employeeId}</td>
+                  <td>${leave.staffmembername}</td>
+                  <td>${leave.email}</td>
+                  <td>${leave.leaveType}</td>
+                  <td>${new Date(leave.startDate).toLocaleDateString()}</td>
+                  <td>${new Date(leave.endDate).toLocaleDateString()}</td>
+                  <td>${leave.reason}</td>
+                  <td>${leave.status}</td>
+                </tr>
+              `
             )
             .join("")}
         </tbody>
@@ -141,10 +125,6 @@ export default function DashLeave() {
       .from(content)
       .set({ margin: 1, filename: "Leave_Report.pdf" })
       .save();
-  };
-
-  const handleGenerateReport = () => {
-    generatePDFReport();
   };
 
   const handleUpdateLeaveStatus = async (_id, newStatus) => {
@@ -184,126 +164,91 @@ export default function DashLeave() {
     }
   };
 
-  return (
-    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
-      <div className=" flex gap-3 justify-start">
-        <div className="flex justify-between pb-4">
-          <Link to="/leaveform/:id">
-            <Button
-              type="button"
-              gradientDuoTone="purpleToBlue"
-              className="w-full , text-black bg-slate-400 "
-              outline
-            >
-              Add Leave Request
-            </Button>
-          </Link>
-        </div>
-      </div>
 
+  return (
+    <div className="table-auto overflow-x-scroll p-3">
       <div className="flex justify-between mb-7">
         <input
           type="text"
           placeholder="Search Leave Requests..."
           value={searchTerm}
           onChange={handleSearch}
-          className="px-3 py-2 w-150 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 mr-2 h-10 dark:bg-slate-800 placeholder-gray-500"
+          className="px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
         />
-        <div></div>
-        <Button
-          gradientDuoTone="purpleToBlue"
-          outline
-          onClick={handleGenerateReport}
-          onChange={handleSearch}
-          className=""
-        >
+        <Button onClick={generatePDFReport} gradientDuoTone="purpleToBlue" outline>
           Generate Report
         </Button>
       </div>
 
-      {(currentUser.isAdmin || currentUser.isManager) && staffLeave.length > 0 ? (
-        <>
-          <Table hoverable className="shadow-md">
-            <Table.Head>
-              <Table.HeadCell>Added Date</Table.HeadCell>
-              <Table.HeadCell>Employee ID</Table.HeadCell>
-              <Table.HeadCell>Employee Name</Table.HeadCell>
-              <Table.HeadCell>Department</Table.HeadCell>
-              <Table.HeadCell>Email</Table.HeadCell>
-              <Table.HeadCell>Leave Type</Table.HeadCell>
-              <Table.HeadCell>From </Table.HeadCell>
-              <Table.HeadCell>TO</Table.HeadCell>
-              <Table.HeadCell>status</Table.HeadCell>
-              <Table.HeadCell>Delete</Table.HeadCell>
-              <Table.HeadCell>View</Table.HeadCell>
-            </Table.Head>
-            {staffLeave.map((leave) => (
-              <Table.Body className="divide-y" key={leave._id}>
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell>
-                    {new Date(leave.appliedOn).toLocaleDateString()}
-                  </Table.Cell>
-
-                  <Table.Cell>{leave.employeeId} </Table.Cell>
-                  <Table.Cell>{leave.staffmembername} </Table.Cell>
-                  <Table.Cell>{leave.departmentname} </Table.Cell>
-                  <Table.Cell>{leave.email} </Table.Cell>
-                  <Table.Cell>{leave.leaveType}</Table.Cell>
-                  <Table.Cell>
-                    {new Date(leave.startDate).toLocaleDateString()}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {new Date(leave.endDate).toLocaleDateString()}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {staffLeave
-                      .filter((leaveRequest) => leaveRequest._id === leave._id) // Filter leave request by matching IDs
-                      .map((leaveRequest) => (
-                        <span
-                          key={leaveRequest._id}
-                          className={`font-semibold rounded-lg p-2 ${
-                            leaveRequest.status === "Pending"
-                              ? "bg-green-500 text-white" // Pending styling
-                              : leaveRequest.status === "Approved"
-                              ? "bg-blue-500 text-white" // Approved styling
-                              : "bg-red-600 text-white" // Rejected styling
-                          }`}
-                        >
-                          {leaveRequest.status}
-                        </span> //Need to implement status changing process
-                      ))}
-                  </Table.Cell>
-
-                  <Table.Cell>
-                    <span
-                      className="font-medium text-red-500 hover:underline cursor-pointer"
-                      onClick={() => {
-                        setShowModel(true);
-                        setLeaveIdToDelete(leave._id);
-                      }}
-                    >
-                      Delete
-                    </span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span
-                      className="font-medium text-blue-500 hover:underline cursor-pointer"
-                      onClick={() => {
-                        setSelectedLeave(leave);
-                        setShowDetailsModal(true);
-                      }}
-                    >
-                      View
-                    </span>
-                  </Table.Cell>
-                </Table.Row>
-              </Table.Body>
-            ))}
-          </Table>
-        </>
+      {staffLeave.length > 0 ? (
+        <Table hoverable>
+          <Table.Head>
+            <Table.HeadCell>Added Date</Table.HeadCell>
+            <Table.HeadCell>Employee ID</Table.HeadCell>
+            <Table.HeadCell>Employee Name</Table.HeadCell>
+            <Table.HeadCell>Department</Table.HeadCell>
+            <Table.HeadCell>Email</Table.HeadCell>
+            <Table.HeadCell>Leave Type</Table.HeadCell>
+            <Table.HeadCell>From</Table.HeadCell>
+            <Table.HeadCell>To</Table.HeadCell>
+            <Table.HeadCell>Status</Table.HeadCell>
+            <Table.HeadCell>Delete</Table.HeadCell>
+            <Table.HeadCell>View</Table.HeadCell>
+          </Table.Head>
+          {staffLeave.map((leave) => (
+            <Table.Body key={leave._id}>
+              <Table.Row>
+                <Table.Cell>{new Date(leave.appliedOn).toLocaleDateString()}</Table.Cell>
+                <Table.Cell>{leave.employeeId}</Table.Cell>
+                <Table.Cell>{leave.staffmembername}</Table.Cell>
+                <Table.Cell>{leave.departmentname}</Table.Cell>
+                <Table.Cell>{leave.email}</Table.Cell>
+                <Table.Cell>{leave.leaveType}</Table.Cell>
+                <Table.Cell>{new Date(leave.startDate).toLocaleDateString()}</Table.Cell>
+                <Table.Cell>{new Date(leave.endDate).toLocaleDateString()}</Table.Cell>
+                <Table.Cell>
+                  <span
+                    className={`p-2 rounded-lg font-semibold ${
+                      leave.status === "Pending"
+                        ? "bg-yellow-500"
+                        : leave.status === "Approved"
+                        ? "bg-green-500"
+                        : "bg-red-500"
+                    } text-white`}
+                  >
+                    {leave.status}
+                  </span>
+                </Table.Cell>
+                <Table.Cell>
+                  <span
+                    className="text-red-500 hover:underline cursor-pointer"
+                    onClick={() => {
+                      setShowModel(true);
+                      setLeaveIdToDelete(leave._id);
+                    }}
+                  >
+                    Delete
+                  </span>
+                </Table.Cell>
+                <Table.Cell>
+                  <span
+                    className="text-blue-500 hover:underline cursor-pointer"
+                    onClick={() => {
+                      setSelectedLeave(leave);
+                      setShowDetailsModal(true);
+                    }}
+                  >
+                    View
+                  </span>
+                </Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          ))}
+        </Table>
       ) : (
-        <p>You have no leave requests to show!</p>
+        <p>No leave requests to display.</p>
       )}
+
       <Modal
         show={showModel}
         onClose={() => setShowModel(false)}
@@ -313,10 +258,8 @@ export default function DashLeave() {
         <Modal.Header />
         <Modal.Body>
           <div className="text-center">
-            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
-            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-200">
-              Are you sure you want to Delete this room
-            </h3>
+            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-500">Are you sure you want to delete this leave request?</h3>
           </div>
           <div className="flex justify-center gap-4">
             <Button color="failure" onClick={handleDeleteLeave}>
